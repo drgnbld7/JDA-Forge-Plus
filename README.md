@@ -1,18 +1,25 @@
-# JDA-Forge-Plus
+<h1 align="center">JDA-Forge-Plus</h1>
 
-An extra **feature pack module** for [JDA-Forge](https://github.com/drgnbld7/JDA-Forge). Drop it into your bot's `modules/` folder to add admin utility commands, database-backup delivery to Discord, backup & log cleanup, module management commands, and a set of ops placeholders — all driven by one config file.
+<p align="center">
+An extra <b>feature pack</b> for <a href="https://github.com/drgnbld7/JDA-Forge">JDA-Forge</a>.<br/>
+Admin utility commands, database backups delivered to Discord, retention, and ops placeholders — driven by one config file.
+</p>
 
-> Requires a running **JDA-Forge** bot · Java 21
+<p align="center">
+<code>Requires JDA-Forge</code> &nbsp;•&nbsp; <code>Java 21</code> &nbsp;•&nbsp; <code>MIT License</code>
+</p>
 
 ---
 
-## ✨ What it adds
+## ✨ Features
 
-- **🛡️ Admin utility commands** — `/botinfo`, `/ping`, `/uptime`, `/serverinfo`, `/userinfo`, `/avatar`. Admin-only by default, with optional role allow-list and ephemeral replies.
-- **📦 Backup → Discord** — Watches the framework's `backups/` folder and uploads every new archive to a channel, respecting the guild's upload size limit.
-- **🧹 Retention** — Automatically prunes old files from `backups/` and `logs/` (by age and/or count; today's log is always kept).
-- **♻️ Module management** — `/reload` reloads all modules at runtime; `/modules` lists loaded modules with their status.
-- **🏷️ Ops placeholders** — `%uptime%`, `%ram_used%`, `%latency%`, `%guild_count%` and more, usable anywhere the framework resolves placeholders.
+| | Feature | |
+|---|---|---|
+| 🛡️ | **Admin commands** | `/botinfo`, `/serverinfo`, `/userinfo`, `/avatar`, `/ping`, `/uptime` — admin-only. |
+| 📦 | **Backup → Discord** | Auto-uploads new database backups to a channel (upload-size aware). |
+| 🧹 | **Retention** | Prunes old files from `backups/` and `logs/` by age and/or count. |
+| ♻️ | **Module management** | `/reload` reloads all modules; `/modules` lists them with status. |
+| 🏷️ | **Ops placeholders** | `%uptime%`, `%ram_used%`, `%latency%`, `%guild_count%` and more. |
 
 ---
 
