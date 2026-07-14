@@ -1,0 +1,84 @@
+# ============================================================================
+#  jda-forge-plus  —  extra feature pack for JDA-Forge
+#  Every feature below can be toggled and tuned from this file.
+# ============================================================================
+
+# ---- Command access control ------------------------------------------------
+# All slash commands from this module are admin-only by default.
+commands:
+  # When true, Discord itself hides the commands from everyone except members
+  # with the ADMINISTRATOR permission.
+  require-admin: true
+  # Extra role IDs allowed to run the commands (checked at runtime, in addition
+  # to administrators). Leave empty for admins-only. Example: ["123", "456"]
+  allowed-role-ids: []
+  # When true, command replies are ephemeral (only the invoker sees them).
+  ephemeral: true
+
+# ---- Info / utility slash commands -----------------------------------------
+info-commands:
+  # Accent color for the embeds this module sends (hex).
+  embed-color: "#9bb0cc"
+  # Individually toggle each command.
+  botinfo: true
+  ping: true
+  uptime: true
+  serverinfo: true
+  userinfo: true
+  avatar: true
+
+# ---- Database backup -> Discord --------------------------------------------
+# Watches the framework's backups/ folder and uploads every NEW archive to a
+# Discord channel. Requires settings.database + auto-backup enabled in the core
+# for automatic archives to appear (the /backup command works with any existing
+# archive regardless).
+backup-to-discord:
+  enabled: false
+  # Target text channel the backups are sent to.
+  channel: "0"
+  # Max upload size in MB. 0 = auto-detect from the guild's Nitro boost tier
+  # (25 / 50 / 100 MB). Archives larger than this are skipped with a console error.
+  max-size-mb: 0
+  # Delete the local .zip after it has been uploaded successfully.
+  delete-after-upload: false
+  # How often (in seconds) to scan backups/ for new archives.
+  watch-interval-seconds: 30
+  # Message posted with the file. Placeholders are supported.
+  message: "\U0001F4E6 New database backup  •  %date% %time%  •  %ram_used%"
+  # Enable the admin-only /backup command (uploads the newest archive on demand).
+  command-enabled: true
+
+# ---- Backup retention (cleanup) --------------------------------------------
+# Prunes old archives from the backups/ folder so it does not grow forever.
+backup-retention:
+  enabled: false
+  # Delete archives older than this many days (0 = ignore age).
+  max-age-days: 7
+  # Keep only the newest N archives (0 = ignore count).
+  max-files: 0
+  # How often (in minutes) the cleanup runs.
+  run-interval-minutes: 60
+
+# ---- Log retention (cleanup) -----------------------------------------------
+# Prunes old files from the framework's logs/ folder. Today's active log file
+# (yyyy-MM-dd.log) is always kept, so live logging is never disrupted.
+log-retention:
+  enabled: false
+  # Delete log files older than this many days (0 = ignore age).
+  max-age-days: 14
+  # Keep only the newest N log files (0 = ignore count).
+  max-files: 0
+  # Also prune crash dump files (dump_*.txt) alongside the .log files.
+  include-crash-dumps: true
+  # How often (in minutes) the cleanup runs.
+  run-interval-minutes: 360
+
+# ---- Ops placeholders ------------------------------------------------------
+# Registers extra %...% tags usable in presence text, embeds and other modules.
+#   %uptime%   %ram_used%   %ram_max%   %ram_percent%   %cpu_cores%
+#   %guild_count%   %latency%   %thread_count%   %date%   %time%
+placeholders:
+  enabled: true
+  # Pattern for %date% / %time% (java.time.format.DateTimeFormatter syntax).
+  date-format: "yyyy-MM-dd"
+  time-format: "HH:mm:ss"
