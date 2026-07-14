@@ -46,7 +46,7 @@ public class JDAForgePlus extends ForgeModule {
             logRetentionTask.start();
         }
 
-        Log.info("enabling " + name() + " " + version());
+        Log.info("Enabling " + name() + " " + version());
     }
 
     @Override
