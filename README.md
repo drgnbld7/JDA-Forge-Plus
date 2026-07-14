@@ -25,7 +25,7 @@ Admin utility commands, database backups delivered to Discord, retention, and op
 
 ## 🚀 Installation
 
-1. Download **`jda-forge-plus-1.0.1.jar`** from the [Releases](../../releases) page.
+1. Download **`jda-forge-plus.jar`** from the [Releases](../../releases) page.
 2. Drop it into your bot's **`modules/`** folder.
 3. Start the bot once — it generates **`config/jda-forge-plus.yml`**.
 4. Edit that file (channel IDs, toggles, colors…), then restart.
