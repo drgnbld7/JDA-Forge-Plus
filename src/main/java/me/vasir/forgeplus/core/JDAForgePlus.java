@@ -46,7 +46,7 @@ public class JDAForgePlus extends ForgeModule {
             logRetentionTask.start();
         }
 
-        Log.done(name() + " v" + version() + " enabled by " + author() + ".");
+        Log.info("enabling " + name() + " " + version());
     }
 
     @Override
@@ -54,6 +54,5 @@ public class JDAForgePlus extends ForgeModule {
         if (backupUploader != null) backupUploader.stop();
         if (retentionTask != null) retentionTask.stop();
         if (logRetentionTask != null) logRetentionTask.stop();
-        Log.info(name() + " disabled.");
     }
 }

@@ -28,7 +28,8 @@ import net.dv8tion.jda.api.sharding.ShardManager;
 import java.awt.Color;
 import java.io.File;
 import java.lang.management.ManagementFactory;
-import java.time.format.DateTimeFormatter;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.Set;
 
 public final class PlusCommands extends ListenerAdapter {
 
-    private static final DateTimeFormatter STAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final String FOOTER = "JDA-Forge-Plus";
     private static final Set<String> OWNED = Set.of(
             "botinfo", "ping", "uptime", "serverinfo", "userinfo", "avatar", "backup", "reload", "modules");
 
@@ -139,15 +140,16 @@ public final class PlusCommands extends ListenerAdapter {
         long maxMb = (rt.maxMemory() == Long.MAX_VALUE ? rt.totalMemory() : rt.maxMemory()) / 1048576L;
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
 
-        EmbedBuilder eb = base("🤖 " + jda.getSelfUser().getName() + " — Status");
-        eb.addField("Uptime", Times.formatDuration(uptime), true);
-        eb.addField("Gateway Ping", jda.getGatewayPing() + " ms", true);
-        eb.addField("Guilds", String.valueOf(guildCount()), true);
-        eb.addField("RAM", usedMb + " / " + maxMb + " MB", true);
-        eb.addField("CPU Cores", String.valueOf(rt.availableProcessors()), true);
-        eb.addField("Threads", String.valueOf(Thread.activeCount()), true);
-        eb.addField("Java", System.getProperty("java.version"), true);
-        eb.addField("JDA", JDAInfo.VERSION, true);
+        EmbedBuilder eb = base("🤖 " + jda.getSelfUser().getName())
+                .setThumbnail(jda.getSelfUser().getEffectiveAvatarUrl());
+        eb.addField("⏱️ Uptime", "`" + Times.formatDuration(uptime) + "`", true);
+        eb.addField("📡 Gateway", "`" + jda.getGatewayPing() + " ms`", true);
+        eb.addField("🌐 Guilds", "`" + guildCount() + "`", true);
+        eb.addField("💾 Memory", "`" + usedMb + " / " + maxMb + " MB`", true);
+        eb.addField("🧠 CPU Cores", "`" + rt.availableProcessors() + "`", true);
+        eb.addField("🧵 Threads", "`" + Thread.activeCount() + "`", true);
+        eb.addField("☕ Java", "`" + System.getProperty("java.version") + "`", true);
+        eb.addField("📚 JDA", "`" + JDAInfo.VERSION + "`", true);
         reply(e, eb);
     }
 
@@ -155,8 +157,8 @@ public final class PlusCommands extends ListenerAdapter {
         long gateway = e.getJDA().getGatewayPing();
         e.getJDA().getRestPing().queue(rest -> {
             EmbedBuilder eb = base("🏓 Pong!");
-            eb.addField("Gateway", gateway + " ms", true);
-            eb.addField("REST", rest + " ms", true);
+            eb.addField("📡 Gateway", "`" + gateway + " ms`", true);
+            eb.addField("🌐 REST", "`" + rest + " ms`", true);
             e.replyEmbeds(eb.build()).setEphemeral(ephemeral).queue();
         });
     }
@@ -164,27 +166,27 @@ public final class PlusCommands extends ListenerAdapter {
     private void handleUptime(SlashCommandInteractionEvent e) {
         long uptime = ManagementFactory.getRuntimeMXBean().getUptime();
         EmbedBuilder eb = base("⏱️ Uptime");
-        eb.setDescription(Times.formatDuration(uptime));
+        eb.setDescription("The bot has been running for **" + Times.formatDuration(uptime) + "**.");
         reply(e, eb);
     }
 
     private void handleServerinfo(SlashCommandInteractionEvent e) {
         Guild g = e.getGuild();
         if (g == null) {
-            e.reply("This command can only be used in servers.").setEphemeral(true).queue();
+            e.reply("⚠️ This command can only be used in a server.").setEphemeral(true).queue();
             return;
         }
         EmbedBuilder eb = base("📊 " + g.getName());
         if (g.getIconUrl() != null) eb.setThumbnail(g.getIconUrl());
-        eb.addField("ID", g.getId(), true);
-        eb.addField("Members", String.valueOf(g.getMemberCount()), true);
-        eb.addField("Boosts", g.getBoostCount() + " (Tier " + g.getBoostTier().getKey() + ")", true);
-        eb.addField("Channels", String.valueOf(g.getChannels().size()), true);
-        eb.addField("Roles", String.valueOf(g.getRoles().size()), true);
-        eb.addField("Created", g.getTimeCreated().format(STAMP), true);
+        eb.addField("🆔 ID", "`" + g.getId() + "`", true);
+        eb.addField("👥 Members", "`" + g.getMemberCount() + "`", true);
+        eb.addField("🚀 Boosts", "`" + g.getBoostCount() + "` (Tier " + g.getBoostTier().getKey() + ")", true);
+        eb.addField("💬 Channels", "`" + g.getChannels().size() + "`", true);
+        eb.addField("🎭 Roles", "`" + g.getRoles().size() + "`", true);
+        eb.addField("📅 Created", relative(g.getTimeCreated()), true);
         g.retrieveOwner().queue(
                 owner -> {
-                    eb.addField("Owner", owner.getUser().getName(), true);
+                    eb.addField("👑 Owner", owner.getUser().getAsMention(), true);
                     e.replyEmbeds(eb.build()).setEphemeral(ephemeral).queue();
                 },
                 err -> e.replyEmbeds(eb.build()).setEphemeral(ephemeral).queue()
@@ -194,16 +196,16 @@ public final class PlusCommands extends ListenerAdapter {
     private void handleUserinfo(SlashCommandInteractionEvent e) {
         User user = resolveUser(e);
         Guild g = e.getGuild();
-        EmbedBuilder eb = base("👤 " + user.getName());
-        eb.setThumbnail(user.getEffectiveAvatarUrl());
-        eb.addField("ID", user.getId(), true);
-        eb.addField("Bot", user.isBot() ? "Yes" : "No", true);
-        eb.addField("Account Created", user.getTimeCreated().format(STAMP), true);
+        EmbedBuilder eb = base("👤 " + user.getName())
+                .setThumbnail(user.getEffectiveAvatarUrl());
+        eb.addField("🆔 ID", "`" + user.getId() + "`", true);
+        eb.addField("🤖 Bot", user.isBot() ? "Yes" : "No", true);
+        eb.addField("📅 Created", relative(user.getTimeCreated()), true);
 
         Member m = (g != null) ? g.getMember(user) : null;
         if (m != null) {
-            eb.addField("Joined Server", m.getTimeJoined().format(STAMP), true);
-            eb.addField("Roles", String.valueOf(m.getRoles().size()), true);
+            eb.addField("📥 Joined", relative(m.getTimeJoined()), true);
+            eb.addField("🎭 Roles", "`" + m.getRoles().size() + "`", true);
             if (m.getColor() != null) eb.setColor(m.getColor());
         }
         reply(e, eb);
@@ -211,41 +213,41 @@ public final class PlusCommands extends ListenerAdapter {
 
     private void handleAvatar(SlashCommandInteractionEvent e) {
         User user = resolveUser(e);
-        EmbedBuilder eb = base("🖼️ " + user.getName());
+        EmbedBuilder eb = base("🖼️ " + user.getName() + "'s Avatar");
         eb.setImage(user.getEffectiveAvatarUrl() + "?size=512");
         reply(e, eb);
     }
 
     private void handleBackup(SlashCommandInteractionEvent e) {
         if (backupChannelId <= 0) {
-            e.reply("⚠️ backup-to-discord.channel is not set.").setEphemeral(true).queue();
+            e.reply("⚠️ `backup-to-discord.channel` is not set in the config.").setEphemeral(true).queue();
             return;
         }
         File latest = latestBackup();
         if (latest == null) {
-            e.reply("📭 No backup found in the backups/ folder.").setEphemeral(true).queue();
+            e.reply("📭 No backup found in the `backups/` folder yet.").setEphemeral(true).queue();
             return;
         }
         BackupSender.Result result = BackupSender.send(
                 latest, backupChannelId, backupMaxSizeMb, backupMessage, backupDeleteAfter);
         String msg = switch (result) {
-            case SENT -> "✅ Uploading the latest backup: `" + latest.getName() + "`";
-            case TOO_LARGE -> "❌ Backup exceeds the upload limit: `" + latest.getName() + "`";
-            case NO_CHANNEL -> "❌ Channel not found (channel: " + backupChannelId + ").";
-            case NO_JDA -> "❌ The bot is not connected.";
-            case ERROR -> "❌ An error occurred while uploading the backup.";
+            case SENT -> "✅ Uploading the latest backup — `" + latest.getName() + "`";
+            case TOO_LARGE -> "❌ Backup `" + latest.getName() + "` exceeds the channel's upload limit.";
+            case NO_CHANNEL -> "❌ Target channel not found (`" + backupChannelId + "`).";
+            case NO_JDA -> "❌ The bot is not connected to Discord.";
+            case ERROR -> "❌ Something went wrong while uploading the backup.";
         };
         e.reply(msg).setEphemeral(true).queue();
     }
 
     private void handleReload(SlashCommandInteractionEvent e) {
-        e.reply("🔄 Reloading modules...").setEphemeral(true).queue(hook ->
+        e.reply("🔄 Reloading modules…").setEphemeral(true).queue(hook ->
                 Threads.async(() -> {
                     try {
                         Modules.reload();
-                        hook.editOriginal("✅ Modules reloaded (" + Modules.list().size() + " modules).").queue();
+                        hook.editOriginal("✅ Reloaded **" + Modules.list().size() + "** module(s).").queue();
                     } catch (Exception ex) {
-                        hook.editOriginal("❌ Reload error: " + ex.getMessage()).queue();
+                        hook.editOriginal("❌ Reload failed: " + ex.getMessage()).queue();
                     }
                 })
         );
@@ -253,29 +255,41 @@ public final class PlusCommands extends ListenerAdapter {
 
     private void handleModules(SlashCommandInteractionEvent e) {
         List<Modules.Info> list = Modules.list();
-        EmbedBuilder eb = base("📦 Modules (" + list.size() + ")");
+        EmbedBuilder eb = base("📦 Loaded Modules — " + list.size());
         if (list.isEmpty()) {
-            eb.setDescription("No modules loaded.");
+            eb.setDescription("No modules are currently loaded.");
         } else {
             StringBuilder sb = new StringBuilder();
             for (Modules.Info m : list) {
-                sb.append(m.enabled() ? "🟢" : "🔴")
-                  .append(" **").append(m.name()).append("** `v").append(m.version()).append("`")
-                  .append(" — ").append(m.author()).append('\n');
+                sb.append(m.enabled() ? "🟢 " : "🔴 ")
+                  .append("**").append(m.name()).append("**")
+                  .append("  `v").append(m.version()).append("`")
+                  .append("  ·  ").append(m.author())
+                  .append('\n');
             }
             eb.setDescription(sb.toString());
         }
         reply(e, eb);
     }
 
+    // ---- Helpers --------------------------------------------------------------
+
     private EmbedBuilder base(String title) {
-        EmbedBuilder eb = new EmbedBuilder().setTitle(title);
+        EmbedBuilder eb = new EmbedBuilder()
+                .setTitle(title)
+                .setFooter(FOOTER)
+                .setTimestamp(Instant.now());
         if (embedColor != null) eb.setColor(embedColor);
         return eb;
     }
 
     private void reply(SlashCommandInteractionEvent e, EmbedBuilder eb) {
         e.replyEmbeds(eb.build()).setEphemeral(ephemeral).queue();
+    }
+
+    /** Renders a Discord relative timestamp (e.g. "2 years ago"); hovering shows the exact date. */
+    private static String relative(OffsetDateTime time) {
+        return "<t:" + time.toEpochSecond() + ":R>";
     }
 
     private static User resolveUser(SlashCommandInteractionEvent e) {

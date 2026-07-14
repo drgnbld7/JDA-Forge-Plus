@@ -1,4 +1,4 @@
-name: "jda-forge-plus"
+name: "JDA-Forge-Plus"
 main: "me.vasir.forgeplus.core.JDAForgePlus"
 version: "1.0.0"
 author: "vasir"
